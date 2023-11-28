@@ -18,16 +18,14 @@ class DataAggregator {
 					const trade = trades[trades.length - 1];
 					const currentPrice = parseFloat(trade[0]);
 
-					if (!this.ready || this.dataArr.length < this.dataArrLen) {
-						this.dataArr.push(currentPrice);
-						this.dataArrLen = this.dataArr.length < min ? min : this.dataArr.length;
-						console.log(`[ALG] >> tick ${this.dataArr.length}`);
-					} else {
-						if (this.dataArr.length > this.dataArrLen) {
-							this.dataArr.shift();
-							this.dataArr.push(currentPrice);
-						}
+					// Always keep the dataArr array with the latest prices, but no longer than dataArrLen
+					this.dataArr.push(currentPrice);
+					if (this.dataArr.length > this.dataArrLen) {
+						this.dataArr.shift(); // remove the oldest price
 					}
+					// Update the dataArrLen after ensuring it's at least equal to 'min'.
+					this.dataArrLen = Math.max(this.dataArr.length, min);
+					console.log(`[ALG] >> tick ${this.dataArr.length}`);
 				}
 			} catch (e) {
 				console.log('Error in parsing to JSON', e);
@@ -49,7 +47,7 @@ class DataAggregator {
 			setTimeout(() => {
 				this.ready = true;
 				console.log('[ALG] >> Ready');
-				console.log(this.dataArrLen)
+				console.log(this.dataArrLen);
 			}, this.readyPos);
 		}).bind(this));
 
@@ -76,15 +74,15 @@ const fetchData = (data) => {
 	try {
 		const averagePrice = calculateAverage(data);
 
-		// filter for anything above the average price, then calculate the average of it
+		// Filter for anything above the average price, then calculate the average of it.
 		const highs = data.filter((value) => value > averagePrice);
 		const highThresh = calculateAverage(highs);
 
-		// do the same for low
+		// Do the same for low.
 		const lows = data.filter((value) => value < averagePrice);
 		const lowThresh = calculateAverage(lows);
 
-		// return
+		// Return the pivot, high, and low values
 		console.log({ pivot: averagePrice, high: highThresh, low: lowThresh })
 		return { pivot: averagePrice, high: highThresh, low: lowThresh };
 	} catch (error) {

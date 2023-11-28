@@ -4,7 +4,7 @@ const market = require('./market.js');
 
 const algorithm = require('./alg2.js');
 const min = (minutes) => minutes * 60000;
-const aggregator = new algorithm.DataAggregator(min(0.5), 9);
+let aggregator = new algorithm.DataAggregator(min(0.5), 20);
 
 let portfolio = {
 	USD: 2000,
