@@ -1,6 +1,3 @@
-# stablecoin bot thingy
+# USDT Trading bot
 
-not finished, not hooked up to exchange either
-
-code is garbage
-and it needs serious optimization
+Work in progress, code is garbage
