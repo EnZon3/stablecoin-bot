@@ -83,7 +83,6 @@ const fetchData = (data) => {
 		const lowThresh = calculateAverage(lows);
 
 		// Return the pivot, high, and low values
-		console.log({ pivot: averagePrice, high: highThresh, low: lowThresh })
 		return { pivot: averagePrice, high: highThresh, low: lowThresh };
 	} catch (error) {
 		console.error("[ALG] >> Data Error:", error);
