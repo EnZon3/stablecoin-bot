@@ -12,3 +12,12 @@ language = "nodejs"
 run = ["node", "old_test/oldind.js"]
 deploymentTarget = "cloudrun"
 ignorePorts = false
+
+[rules]
+
+[rules.formatter]
+
+[rules.formatter.fileExtensions]
+
+[rules.formatter.fileExtensions.".js"]
+id = "module:nodejs-20:v11-20231122-8e4093b/languageServer:typescript-language-server"
