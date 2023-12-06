@@ -1,10 +1,11 @@
 const WebSocket = require("ws");
 const ws = new WebSocket("wss://ws.kraken.com");
-const market = require("./market.js");
+const market = require("./paperMarket.js");
 
 const algorithm = require("./alg2.js");
 const min = (minutes) => minutes * 60000;
-let aggregator = new algorithm.DataAggregator(min(0.5), 20);
+const pair = "USDT/USD";
+let aggregator = new algorithm.DataAggregator(min(0.5), 20, pair);
 
 let portfolio = {
   USD: 2000,
@@ -19,7 +20,7 @@ ws.on("open", function open() {
   console.log("[TRD] >> Connected");
   const subscribeMessage = {
     event: "subscribe",
-    pair: ["USDT/EUR"],
+    pair: [pair],
     subscription: {
       name: "trade",
     },
@@ -37,7 +38,7 @@ ws.on("message", function incoming(data) {
       );
     } else if (
       jsonData[2] === "trade" &&
-      jsonData[3] === "USDT/EUR" &&
+      jsonData[3] === pair &&
       aggregator.ready === true
     ) {
       const trades = jsonData[1];

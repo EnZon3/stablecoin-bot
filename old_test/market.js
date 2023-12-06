@@ -32,7 +32,7 @@ const krakenRequest = (uriPath, data, apiKey, apiSecret) => {
 
 const trade = (type, volume) => {
 	const data = {
-		"pair": "USDTZEUR",
+		"pair": "USDTZUSD",
 		"type": type,
 		"ordertype": "market",
 		"volume": volume,

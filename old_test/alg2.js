@@ -6,14 +6,15 @@ class DataAggregator {
 	ready = false;
 	dataArrLen = 0;
 
-	constructor(readyPos, min) {
+	constructor(readyPos, min, pair) {
 		this.readyPos = readyPos;
+		this.pair = pair;
 		this.ws = new WebSocket('wss://ws.kraken.com');
 		this.ws.on('message', (async function incoming(data) {
 			try {
 				const jsonData = JSON.parse(data);
 
-				if (jsonData[2] === 'trade' && jsonData[3] === 'USDT/EUR') {
+				if (jsonData[2] === 'trade' && jsonData[3] === this.pair) {
 					const trades = jsonData[1];
 					const trade = trades[trades.length - 1];
 					const currentPrice = parseFloat(trade[0]);
@@ -36,7 +37,7 @@ class DataAggregator {
 			const subscribeMessage = {
 				"event": "subscribe",
 				"pair": [
-					"USDT/EUR"
+					this.pair
 				],
 				"subscription": {
 					"name": "trade"
