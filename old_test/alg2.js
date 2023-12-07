@@ -26,7 +26,10 @@ class DataAggregator {
 					}
 					// Update the dataArrLen after ensuring it's at least equal to 'min'.
 					this.dataArrLen = Math.max(this.dataArr.length, min);
-					console.log(`[ALG] >> tick ${this.dataArr.length}`);
+					
+					if (this.ready === false) {
+						console.log(`[ALG] >> tick ${this.dataArr.length}`);
+					}
 				}
 			} catch (e) {
 				console.log('Error in parsing to JSON', e);

@@ -5,7 +5,7 @@ const market = require("./market.js");
 const algorithm = require("./alg2.js");
 const min = (minutes) => minutes * 60000;
 const pair = "USDT/USD";
-let aggregator = new algorithm.DataAggregator(min(0.5), 20, pair);
+let aggregator = new algorithm.DataAggregator(min(1.3), 20, pair);
 
 let portfolio = {
   USD: 2000,
