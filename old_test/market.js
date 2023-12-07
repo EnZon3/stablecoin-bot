@@ -57,7 +57,7 @@ const buyToken = async (price) => {
 
 	if (portfolio.ZUSD >= amountToBuy * price) {
 		trade('buy', amountToBuy).then(response => {
-			console.log(`[TRD] >> Bought USDT at ${price} USD\n`, response.data.result.descr.order);
+			console.log(`[TRD] >> Bought USDT at ${price} USD\n`);
 		}).catch(error => {
 			console.error('[TRD] >> Error buying USDT:', error);
 		});
