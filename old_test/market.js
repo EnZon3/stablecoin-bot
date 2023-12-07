@@ -19,6 +19,8 @@ const getMessageSignature = (path, request, secret, nonce) => {
 	return hmac_digest;
 };
 
+const amountToBuy = 100;
+
 const krakenRequest = (uriPath, data, apiKey, apiSecret) => {
 	const nonce = data.nonce;
 	const headers = {
@@ -36,6 +38,7 @@ const trade = (type, volume) => {
 		"type": type,
 		"ordertype": "market",
 		"volume": volume,
+		"timeinforce": "IOC",
 		"nonce": Math.floor(Math.random() * 1000000),
 	};
 	return krakenRequest("/0/private/AddOrder", data, api_key, api_secret);
@@ -59,7 +62,7 @@ const buyToken = async (price) => {
 			console.error('[TRD] >> Error buying USDT:', error);
 		});
 	} else {
-		console.log("no money AAAAH");
+		console.log("[TRD] >> Insufficient funds");
 	}
 };
 

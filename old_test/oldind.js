@@ -1,6 +1,6 @@
 const WebSocket = require("ws");
 const ws = new WebSocket("wss://ws.kraken.com");
-const market = require("./paperMarket.js");
+const market = require("./market.js");
 
 const algorithm = require("./alg2.js");
 const min = (minutes) => minutes * 60000;
@@ -17,7 +17,7 @@ let high;
 let low;
 
 ws.on("open", function open() {
-  console.log("[TRD] >> Connected");
+  console.log("[MKT] >> Connected");
   const subscribeMessage = {
     event: "subscribe",
     pair: [pair],
@@ -45,26 +45,21 @@ ws.on("message", function incoming(data) {
       const trade = trades[trades.length - 1];
       const currentPrice = parseFloat(trade[0]);
 
-      console.log(`[TRD] >> Current Price: ${currentPrice} EUR`);
+      console.log(`[MKT] >> Current Price: ${currentPrice} USD`);
 
       [pivot, high, low] = Object.values(
         algorithm.fetchData(aggregator.dataArr)
       );
-
+		
       console.log(
-        `[TRD] Action: ${
-          currentPrice > high ? "sell" : currentPrice < low ? "buy" : "hold"
-        }`
-      );
-      console.log(
-        `[TRD] >> Pivot: ${pivot} EUR\n[TRD] >> High: ${high} EUR\n[TRD] >> Low: ${low} EUR`
+        `[MKT] >> Pivot: ${pivot} USD\n[MKT] >> High: ${high} USD\n[MKT] >> Low: ${low} USD`
       );
 
       // logic for buying and selling
-      if (currentPrice >= high.toFixed(4)) {
-        market.sellToken(currentPrice, portfolio);
-      } else if (currentPrice <= low.toFixed(4)) {
-        market.buyToken(currentPrice, portfolio);
+      if (currentPrice >= high.toFixed(5)) {
+        market.sellToken(currentPrice);
+      } else if (currentPrice <= low.toFixed(5)) {
+        market.buyToken(currentPrice);
       }
     }
   } catch (e) {
@@ -73,5 +68,5 @@ ws.on("message", function incoming(data) {
 });
 
 ws.on("close", function close() {
-  console.log("[TRD] >> Disconnected");
+  console.log("[MKT] >> Disconnected");
 });
