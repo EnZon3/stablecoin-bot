@@ -79,7 +79,7 @@ const sellToken = async (price) => {
 	
 	if (portfolio.USDT > 0) {
 		trade('sell', portfolio.USDT).then(response => {
-			console.log(`[TRD] >> Sold all USDT at ${price} USD\n`, response.data.result.descr.order);
+			console.log(`[TRD] >> Sold all USDT at ${price} USD\n`);
 		})
 		.catch(error => console.error('[TRD] >> Error selling USDT:', error));
 	}
