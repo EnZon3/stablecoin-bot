@@ -26,7 +26,7 @@ class DataAggregator {
 					}
 					// Update the dataArrLen after ensuring it's at least equal to 'min'.
 					this.dataArrLen = Math.max(this.dataArr.length, min);
-					
+
 					if (this.ready === false) {
 						console.log(`[ALG] >> tick ${this.dataArr.length}`);
 					}
@@ -71,7 +71,7 @@ class DataAggregator {
 	}
 }
 
-const fetchData = (data) => {
+const getThresholds = (data) => {
 	// Define a function to calculate the average of an array
 	const calculateAverage = (array) => array.reduce((sum, value) => sum + value, 0) / array.length;
 
@@ -93,4 +93,28 @@ const fetchData = (data) => {
 	}
 };
 
-module.exports = { DataAggregator, fetchData };
+const getSignal = (aggregator) => {
+	// how the fuck do i do statistics?
+	let data = aggregator.dataArr;
+	let thresholds = getThresholds(data);
+
+	const highs = data.filter((value) => value > thresholds.high).length;
+	const lows = data.filter((value) => value < thresholds.low).length;
+
+	//get percentages based from indexes
+	const highPercent = (highs / data.length) * 100;
+	const lowPercent = (lows / data.length) * 100;
+	console.log(`[ALG] >> High: ${highPercent}%, Low: ${lowPercent}%`)
+
+	// if percentage on any side higher than x%, buy or sell
+	const x = 80;
+	if (highPercent > x) {
+		return 'buy';
+	} else if (lowPercent > x) {
+		return 'sell';
+	} else {
+		return 'hold';
+	}
+};
+
+module.exports = { DataAggregator, getThresholds, getSignal };
