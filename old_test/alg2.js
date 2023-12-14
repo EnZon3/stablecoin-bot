@@ -68,6 +68,10 @@ class DataAggregator {
 		this.ws.on('close', (function close() {
 			console.log('[ALG] >> Data Aggregator disconnected!');
 		}).bind(this));
+		
+		setInterval(() => {
+			this.ws.ping();
+		}, 300000)
 	}
 }
 
@@ -107,10 +111,11 @@ const getSignal = (aggregator) => {
 	console.log(`[ALG] >> High: ${highPercent}%, Low: ${lowPercent}%`)
 
 	// if percentage on any side higher than x%, buy or sell
-	const x = 80;
+	const x = 65;
+	const y = 55;
 	if (highPercent > x) {
 		return 'buy';
-	} else if (lowPercent > x) {
+	} else if (lowPercent > y) {
 		return 'sell';
 	} else {
 		return 'hold';

@@ -1,22 +1,37 @@
 const WebSocket = require("ws");
 const ws = new WebSocket("wss://ws.kraken.com");
+const fs = require("fs");
 const market = require("./market.js");
-
 const algorithm = require("./alg2.js");
+
+// config stuff
 const min = (minutes) => minutes * 60000;
 const pair = "USDT/USD";
-let aggregator = new algorithm.DataAggregator(min(5), 100, pair);
-const delayAgo = new Date().getTime()
+let aggregator = new algorithm.DataAggregator(min(5.5), 100, pair);
+let previousTimestamp = 0;
 
+//not used for live trading
 let portfolio = {
 	USD: 2000,
 	USDT: 0,
 };
 
-let pivot;
-let high;
-let low;
+// poor man's logger
+const logFile = 'bot.log';
+function writeToLogFile(message) {
+	fs.appendFileSync(logFile, `${new Date().toLocaleString('en-US', { timeZone: 'EST' })} | ` + message + '\n', (err) => {
+		if (err) throw err;
+	});
+}
 
+
+const originalConsoleLog = console.log;
+console.log = function (message) {
+	originalConsoleLog(message);
+	writeToLogFile(message);
+};
+
+//here is the start of the real code
 ws.on("open", function open() {
 	console.log("[MKT] >> Connected");
 	const subscribeMessage = {
@@ -31,6 +46,10 @@ ws.on("open", function open() {
 });
 
 ws.on("message", function incoming(data) {
+	//delay check
+	const currentTimestamp = Date.now();
+	if (currentTimestamp - previousTimestamp < 1000) return;
+
 	try {
 		const jsonData = JSON.parse(data);
 		if (jsonData.event && jsonData.event === "systemStatus") {
@@ -42,6 +61,7 @@ ws.on("message", function incoming(data) {
 			jsonData[3] === pair &&
 			aggregator.ready === true
 		) {
+			previousTimestamp = currentTimestamp;
 			const trades = jsonData[1];
 			const trade = trades[trades.length - 1];
 			const currentPrice = parseFloat(trade[0]);
@@ -52,18 +72,22 @@ ws.on("message", function incoming(data) {
 			console.log(`[ALG] >> Signal: ${signal}`);
 
 			// logic for buying and selling
-			// if current time x seconds ago than delayAgo return
-			if (new Date().getTime() - delayAgo < min(5)) { return; }
 			if (signal === "buy") {
-				market.buyToken(currentPrice);
+				//market.buyToken(currentPrice);
+				console.log("buy")
 			} else if (signal === "sell") {
-				market.sellToken(currentPrice);
+				//market.sellToken(currentPrice);
+				console.log("sell")
 			}
 		}
 	} catch (e) {
 		console.log("Error:" + e);
 	}
 });
+
+setInterval(() => {
+	ws.ping();
+}, 300000)
 
 ws.on("close", function close() {
 	console.log("[MKT] >> Disconnected");
