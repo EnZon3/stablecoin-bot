@@ -7,7 +7,7 @@ const algorithm = require("./alg2.js");
 // config stuff
 const min = (minutes) => minutes * 60000;
 const pair = "USDT/USD";
-let aggregator = new algorithm.DataAggregator(min(5.5), 100, pair);
+let aggregator = new algorithm.DataAggregator(min(5.5), 55, pair);
 let previousTimestamp = 0;
 
 //not used for live trading
@@ -26,7 +26,7 @@ function writeToLogFile(message) {
 
 
 const originalConsoleLog = console.log;
-console.log = function (message) {
+console.log = function(message) {
 	originalConsoleLog(message);
 	writeToLogFile(message);
 };
@@ -73,11 +73,9 @@ ws.on("message", function incoming(data) {
 
 			// logic for buying and selling
 			if (signal === "buy") {
-				//market.buyToken(currentPrice);
-				console.log("buy")
+				market.buyToken(currentPrice);
 			} else if (signal === "sell") {
-				//market.sellToken(currentPrice);
-				console.log("sell")
+				market.sellToken(currentPrice);
 			}
 		}
 	} catch (e) {

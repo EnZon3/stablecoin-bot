@@ -67,6 +67,7 @@ class DataAggregator {
 
 		this.ws.on('close', (function close() {
 			console.log('[ALG] >> Data Aggregator disconnected!');
+			this.ws = new WebSocket('wss://ws.kraken.com');
 		}).bind(this));
 		
 		setInterval(() => {
