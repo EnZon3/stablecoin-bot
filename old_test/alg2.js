@@ -6,8 +6,7 @@ class DataAggregator {
 	ready = false;
 	dataArrLen = 0;
 
-	constructor(readyPos, min, pair) {
-		this.readyPos = readyPos;
+	constructor(min, pair) {
 		this.pair = pair;
 		this.ws = new WebSocket('wss://ws.kraken.com');
 		this.ws.on('message', (async function incoming(data) {
@@ -21,11 +20,10 @@ class DataAggregator {
 
 					// Always keep the dataArr array with the latest prices, but no longer than dataArrLen
 					this.dataArr.push(currentPrice);
-					if (this.dataArr.length > this.dataArrLen) {
+					if (this.dataArr.length > min) {
 						this.dataArr.shift(); // remove the oldest price
+						this.ready = true;
 					}
-					// Update the dataArrLen after ensuring it's at least equal to 'min'.
-					this.dataArrLen = Math.max(this.dataArr.length, min);
 
 					if (this.ready === false) {
 						console.log(`[ALG] >> tick ${this.dataArr.length}`);
@@ -48,11 +46,6 @@ class DataAggregator {
 			}
 
 			this.ws.send(JSON.stringify(subscribeMessage));
-			setTimeout(() => {
-				this.ready = true;
-				console.log('[ALG] >> Ready');
-				console.log(this.dataArrLen);
-			}, this.readyPos);
 		}).bind(this));
 
 		this.ws.on('ping', (function ping() {
@@ -83,12 +76,14 @@ const getThresholds = (data) => {
 	try {
 		const averagePrice = calculateAverage(data);
 
+		const halfData = data.slice(0, data.length / 2);
+
 		// Filter for anything above the average price, then calculate the average of it.
-		const highs = data.filter((value) => value > averagePrice);
+		const highs = halfData.filter((value) => value > averagePrice);
 		const highThresh = calculateAverage(highs);
 
 		// Do the same for low.
-		const lows = data.filter((value) => value < averagePrice);
+		const lows = halfData.filter((value) => value < averagePrice);
 		const lowThresh = calculateAverage(lows);
 
 		// Return the pivot, high, and low values
@@ -99,8 +94,9 @@ const getThresholds = (data) => {
 };
 
 const getSignal = (aggregator) => {
-	// how the fuck do i do statistics?
-	let data = aggregator.dataArr;
+	//use only half of the array for the calculations under this
+	const data = aggregator.dataArr.slice(0, aggregator.dataArr.length / 2);
+	
 	let thresholds = getThresholds(data);
 
 	const highs = data.filter((value) => value > thresholds.high).length;

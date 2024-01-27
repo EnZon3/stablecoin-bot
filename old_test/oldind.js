@@ -1,13 +1,13 @@
 const WebSocket = require("ws");
 const ws = new WebSocket("wss://ws.kraken.com");
 const fs = require("fs");
-const market = require("./market.js");
+const market = require("./paperMarket.js");
 const algorithm = require("./alg2.js");
 
 // config stuff
 const min = (minutes) => minutes * 60000;
 const pair = "USDT/USD";
-let aggregator = new algorithm.DataAggregator(min(5.5), 55, pair);
+let aggregator = new algorithm.DataAggregator(55 * 2, pair);
 let previousTimestamp = 0;
 
 //not used for live trading
@@ -73,9 +73,9 @@ ws.on("message", function incoming(data) {
 
 			// logic for buying and selling
 			if (signal === "buy") {
-				market.buyToken(currentPrice);
+				market.buyToken(currentPrice, portfolio);
 			} else if (signal === "sell") {
-				market.sellToken(currentPrice);
+				market.sellToken(currentPrice, portfolio);
 			}
 		}
 	} catch (e) {
